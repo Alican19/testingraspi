@@ -7,7 +7,7 @@ const app = express();
 app.get('/data', async (req, res) => {
   try {
     // IP-Adresse des Raspberry Pi (ersetze <raspberry_ip> mit der tatsächlichen IP-Adresse deines Pi)
-    const response = await axios.get('http://<raspberry_ip>:5000/data');
+    const response = await axios.get('192.168.68.69:5000/data');
     res.json(response.data);  // Sensordaten von Pi an die Webseite weitergeben
   } catch (error) {
     console.error('Fehler beim Abrufen der Sensordaten:', error);
