@@ -1,6 +1,9 @@
 const express = require('express');
+const cors = require('cors'); 
 const path = require('path');
 const app = express();
+
+app.use(cors());
 
 // Simulierte Sensordaten (werden durch POST-Anfragen überschrieben)
 let sensorData = { temperature: 22.5, humidity: 60 };
