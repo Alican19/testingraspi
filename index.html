@@ -1,56 +1,58 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitoring Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
 </head>
 <body>
-  <div id="app" class="container">
-    <h1>Monitoring Dashboard</h1>
-
-    <div class="data-card">
-      <div class="icon">🌡️</div>
-      <div class="data">
-        <h2>Temperatur</h2>
-        <p>{{ temperature }} °C</p>
-      </div>
+    <div id="app" class="container">
+        <h1>Monitoring Dashboard</h1>
+        <div class="data-card">
+            <div class="icon">🌡️</div>
+            <div class="data">
+                <h2>Temperatur</h2>
+                <p>{{ temperature }} °C</p>
+            </div>
+        </div>
+        <div class="data-card">
+            <div class="icon">💧</div>
+            <div class="data">
+                <h2>Luftfeuchtigkeit</h2>
+                <p>{{ humidity }} %</p>
+            </div>
+        </div>
     </div>
 
-    <div class="data-card">
-      <div class="icon">💧</div>
-      <div class="data">
-        <h2>Luftfeuchtigkeit</h2>
-        <p>{{ humidity }} %</p>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    new Vue({
-      el: '#app',
-      data: {
-        temperature: '--',
-        humidity: '--'
-      },
-      mounted() {
-        this.fetchData();
-        setInterval(this.fetchData, 5000);
-      },
-      methods: {
-        fetchData() {
-          fetch('/data')
-            .then(response => response.json())
-            .then(data => {
-              this.temperature = data.temperature;
-              this.humidity = data.humidity;
-            })
-            .catch(error => console.error('Fehler beim Abrufen der Daten:', error));
-        }
-      }
-    });
-  </script>
+    <script>
+        const { createApp } = Vue;
+        
+        createApp({
+            data() {
+                return {
+                    temperature: '--',
+                    humidity: '--'
+                }
+            },
+            mounted() {
+                this.updateData();
+                setInterval(this.updateData, 5000);
+            },
+            methods: {
+                async updateData() {
+                    try {
+                        const response = await fetch('/data');
+                        const data = await response.json();
+                        this.temperature = data.temperature;
+                        this.humidity = data.humidity;
+                    } catch (error) {
+                        console.error('Fehler beim Abrufen der Daten:', error);
+                    }
+                }
+            }
+        }).mount('#app');
+    </script>
 </body>
 </html>
