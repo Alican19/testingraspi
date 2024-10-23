@@ -1,35 +1,42 @@
 const express = require('express');
-const cors = require('cors'); 
-const path = require('path');
 const app = express();
 
-app.use(cors());
+let sensorData = { temperatur: null, luftfeuchtigkeit: null };  // Speichern der Sensordaten im Speicher
 
-// Simulierte Sensordaten (werden durch POST-Anfragen überschrieben)
-let sensorData = { temperature: 22.5, humidity: 60 };
-
-// Middleware zum Verarbeiten von JSON-Daten
+// Middleware, um JSON-Daten im Body der Anfrage zu parsen
 app.use(express.json());
 
 // POST-Route zum Empfangen der Sensordaten vom Raspberry Pi
 app.post('/data', (req, res) => {
-  // Die Sensordaten vom Raspberry Pi werden hier gespeichert
-  sensorData = req.body;
-  console.log(`Daten empfangen: ${JSON.stringify(sensorData)}`);
-  res.status(200).send('Data received successfully');
+    const { temperatur, luftfeuchtigkeit } = req.body;
+
+    // Überprüfen, ob die notwendigen Daten vorhanden sind
+    if (temperatur !== undefined && luftfeuchtigkeit !== undefined) {
+        // Sensordaten im Speicher speichern
+        sensorData = { temperatur, luftfeuchtigkeit };
+        console.log(`Daten empfangen: Temperatur=${temperatur}°C, Luftfeuchtigkeit=${luftfeuchtigkeit}%`);
+        
+        // Erfolgsmeldung senden
+        res.status(200).send('Daten erfolgreich gespeichert!');
+    } else {
+        // Fehlermeldung, wenn die Daten unvollständig sind
+        res.status(400).send('Fehler: Temperatur und Luftfeuchtigkeit müssen angegeben werden.');
+    }
 });
 
 // GET-Route zum Abrufen der aktuellen Sensordaten
 app.get('/data', (req, res) => {
-  res.json(sensorData);  // Aktuelle Sensordaten zurückgeben
+    if (sensorData.temperatur !== null && sensorData.luftfeuchtigkeit !== null) {
+        // Aktuelle Sensordaten zurückgeben
+        res.status(200).json(sensorData);
+    } else {
+        // Fehler: Keine Daten vorhanden
+        res.status(404).send('Keine Sensordaten verfügbar.');
+    }
 });
 
-// Route für die Vue.js-Anwendung
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
+// Starte den Server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server läuft auf Port ${port}`);
+    console.log(`Server läuft auf Port ${port}`);
 });
