@@ -1,11 +1,13 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 
+// Statische HTML-Datei ausliefern
 app.get('/', (req, res) => {
-  res.send('Hello, this is Azure Web App running a Node.js application!');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const port = process.env.PORT || 4000;
+const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
